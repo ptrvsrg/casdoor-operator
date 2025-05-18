@@ -1,0 +1,49 @@
+{{- if or .Values.metrics.enabled .Values.probe.enabled .Values.pprof.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "casdoor-operator.fullname" . }}
+  labels:
+    {{- include "casdoor-operator.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+  {{- if .Values.metrics.enabled }}
+    - name: metrics
+      targetPort: metrics
+      port: {{ .Values.service.metricsPort }}
+      protocol: TCP
+      {{- if .Values.enableHTTP2 }}
+      appProtocol: http2
+      {{- end }}
+      {{- if contains "NodePort" .Values.service.type }}
+      nodePort: {{ .Values.service.metricsNodePort }}
+      {{- end }}
+  {{- end }}
+  {{- if .Values.probe.enabled }}
+    - name: probe
+      targetPort: probe
+      port: {{ .Values.service.probePort }}
+      protocol: TCP
+      {{- if .Values.enableHTTP2 }}
+      appProtocol: http2
+      {{- end }}
+      {{- if contains "NodePort" .Values.service.type }}
+      nodePort: {{ .Values.service.probeNodePort }}
+      {{- end }}
+  {{- end }}
+  {{- if .Values.pprof.enabled }}
+    - name: pprof
+      targetPort: pprof
+      port: {{ .Values.service.pprofPort }}
+      protocol: TCP
+      {{- if .Values.enableHTTP2 }}
+      appProtocol: http2
+      {{- end }}
+      {{- if contains "NodePort" .Values.service.type }}
+      nodePort: {{ .Values.service.pprofNodePort }}
+      {{- end }}
+  {{- end }}
+  selector:
+    {{- include "casdoor-operator.selectorLabels" . | nindent 4 }}
+{{- end }}

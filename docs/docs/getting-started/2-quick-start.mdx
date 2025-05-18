@@ -1,0 +1,58 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Quick start
+
+<Tabs>
+    <TabItem value="minikube" label="Minikube" default>
+        Minikube provides a local Kubernetes, designed to make it easy to learn and develop for Kubernetes. The
+        Kubernetes cluster is started either inside a virtual machine, a container or on bare-metal, depending on the
+        minikube driver you choose.
+
+        ## Installation dependencies
+
+        * [minikube](https://minikube.sigs.k8s.io/docs/start/)
+        * [kubectl](https://kubernetes.io/docs/reference/kubectl/overview/)
+        * [helm](https://helm.sh/)
+
+        Once you have all the dependencies installed, make sure everything works:
+
+        ```bash
+        minikube version
+        kubectl version
+        ```
+
+        ## Starting the Kubernetes cluster
+
+        Run the following command to start a local Kubernetes cluster:
+
+        ```bash
+        minikube start --memory=4096 # 2GB default memory isn't always enough
+        ```
+
+        ## Install CRDs
+
+        First, download the CRDs from the [releases](https://github.com/ptrvsrg/casdoor-operator/releases) page.
+
+        ```bash
+        kubectl apply -f https://github.com/ptrvsrg/casdoor-operator/releases/v0.0.0/download/crds_v0.0.0.yaml
+        ```
+
+        ## Install the Casdoor Operator
+
+        Using Helm to install the Casdoor Operator:
+
+        ```bash
+        helm repo add ptrvsrg https://ptrvsrg.github.io/casdoor-operator/charts
+        helm repo update
+        helm install casdoor-operator ptrvsrg/casdoor-operator --namespace casdoor-operator
+        ```
+
+        Using kubectl to check the status of the deployment of the Casdoor Operator:
+
+        ```bash
+        kubectl get deployments -n casdoor-operator
+        ```
+    </TabItem>
+</Tabs>
+

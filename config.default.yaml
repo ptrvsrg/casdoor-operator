@@ -1,0 +1,42 @@
+enableHTTP2: true
+
+metrics:
+  enabled: false
+  port: 8080
+  secure: false
+
+probe:
+  enabled: false
+  port: 8082
+  readinessEndpointName: readyz
+  livenessEndpointName: healthz
+
+pprof:
+  enabled: false
+  port: 8081
+
+logging:
+  level: info
+  format: json
+
+leaderElection:
+  enabled: false
+  id: casdoor-operator-leader-election
+  namespace: default
+  retryPeriod: 2s
+  renewDeadline: 10s
+  leaseDuration: 15s
+
+globalController:
+  skipNameValidation:
+  groupKindConcurrency: { }
+  maxConcurrentReconciles: 1
+  cacheSyncTimeout: 2m
+  needLeaderElection:
+
+specificControllers:
+  casdoor:
+    skipNameValidation:
+    maxConcurrentReconciles: 1
+    cacheSyncTimeout: 2m
+    needLeaderElection:

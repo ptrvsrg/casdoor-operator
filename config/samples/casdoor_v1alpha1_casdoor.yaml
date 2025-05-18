@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: casdoor-admin-credentials
+  labels:
+    app.kubernetes.io/name: casdoor-operator
+    app.kubernetes.io/managed-by: kustomize
+type: Opaque
+data:
+  username: YWRtaW4K
+  password: MTIzCg==
+---
+apiVersion: casdoor.ptrvsrg.github.com/v1alpha1
+kind: Casdoor
+metadata:
+  labels:
+    app.kubernetes.io/name: casdoor-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: casdoor-sample
+spec:
+  adminCredentialsSecret:
+    name: casdoor-admin-credentials
+  url: http://casdoor-casdoor-helm-charts.default.svc.cluster.local:8000

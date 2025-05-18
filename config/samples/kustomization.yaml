@@ -1,0 +1,4 @@
+## Append samples of your project ##
+resources:
+- casdoor_v1alpha1_casdoor.yaml
+# +kubebuilder:scaffold:manifestskustomizesamples
