@@ -2,10 +2,10 @@ apiVersion: v1
 entries:
   casdoor-operator:
   - apiVersion: v2
-    appVersion: refs/tags/v0.0.0-RC2
-    created: "2025-05-23T20:34:05.927414479Z"
+    appVersion: refs/tags/v0.0.0-RC1
+    created: "2025-05-23T20:53:56.049085997Z"
     description: A Helm chart for Kubernetes Operator for Casdoor
-    digest: 71d4bad7e879c381200b3452c991a787539f4ceefde50b2c4d61e992f646078c
+    digest: b0798d7bb55298ecaef5a58033331e9cd86082fc653d23d554def9ee3a59d1c3
     icon: https://raw.githubusercontent.com/ptrvsrg/casdoor-operator/refs/heads/feature/1-init/.assets/logo.png
     keywords:
     - casdoor
@@ -21,4 +21,4 @@ entries:
     urls:
     - https://ptrvsrg.github.io/casdoor-operator/charts/casdoor-operator-0.0.1.tgz
     version: 0.0.1
-generated: "2025-05-23T20:34:05.926691691Z"
+generated: "2025-05-23T20:53:56.048166026Z"
