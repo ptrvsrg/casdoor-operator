@@ -1,0 +1,24 @@
+apiVersion: v1
+entries:
+  casdoor-operator:
+  - apiVersion: v2
+    appVersion: 0.0.1
+    created: "2025-05-23T19:17:32.012975325Z"
+    description: A Helm chart for Kubernetes Operator for Casdoor
+    digest: a45bbee3850169c209d6f4fac851aaa227eb8288bb9da38086778360829b84f8
+    icon: https://raw.githubusercontent.com/ptrvsrg/casdoor-operator/main/.assets/logo.png
+    keywords:
+    - casdoor
+    - operator
+    - sso
+    - auth
+    maintainers:
+    - name: ptrvsrg
+    name: casdoor-operator
+    sources:
+    - https://github.com/ptrvsrg/casdoor-operator
+    type: application
+    urls:
+    - https://ptrvsrg.github.io/casdoor-operator/charts/casdoor-operator-0.0.1.tgz
+    version: 0.0.1
+generated: "2025-05-23T19:17:32.01212416Z"
