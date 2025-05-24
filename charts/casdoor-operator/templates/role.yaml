@@ -1,0 +1,28 @@
+{{- if and .Values.rbac.create .Values.serviceAccount.create .Values.globalResources.create -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "casdoor-operator.fullname" . }}-role
+  labels:
+    {{- include "casdoor-operator.labels" . | nindent 4 }}
+rules:
+  # RBAC for Casdoor
+  - apiGroups: [ "casdoor.ptrvsrg.github.com" ]
+    resources: [ "casdoors" ]
+    verbs: [ "create", "delete", "get", "list", "patch", "update", "watch" ]
+  - apiGroups: [ "casdoor.ptrvsrg.github.com" ]
+    resources: [ "casdoors/finalizers" ]
+    verbs: [ "update" ]
+  - apiGroups: [ "casdoor.ptrvsrg.github.com" ]
+    resources: [ "casdoors/status" ]
+    verbs: [ "get", "update", "patch" ]
+  # RBAC for Metrics Reader
+  - nonResourceURLs:
+      - "/metrics"
+    verbs:
+      - get
+  # RBAC for Metrics Auth
+  - apiGroups: [ "authentication.k8s.io" ]
+    resources: [ "tokenreviews", "subjectaccessreviews" ]
+    verbs: [ "create" ]
+  {{- end }}

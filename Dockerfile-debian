@@ -1,0 +1,70 @@
+ARG GOLANG_IMAGE_NAME
+ARG GOLANG_IMAGE_VERSION
+ARG RUNTIME_IMAGE_NAME
+ARG RUNTIME_IMAGE_VERSION
+
+# Install the Go dependencies
+FROM ${GOLANG_IMAGE_NAME:-golang}:${GOLANG_IMAGE_VERSION:-1.24.2-bookworm} AS deps
+
+ARG TARGETOS
+ARG TARGETARCH
+
+WORKDIR /casdoor-operator
+
+COPY go.mod go.mod
+COPY go.sum go.sum
+
+ENV GO111MODULE=on
+
+RUN go mod download
+
+# Build the manager binary
+FROM deps AS build
+
+COPY cmd cmd
+COPY api api
+COPY config config
+COPY internal internal
+
+ENV CGO_ENABLED=0
+ENV GOOS=${TARGETOS:-linux}
+ENV GOARCH=${TARGETARCH}
+ARG ARTIFACT_VERSION
+
+RUN go generate ./...
+RUN go build \
+    -o ./bin/manager \
+    -installsuffix "static" \
+    -tags "" \
+    -ldflags " \
+        -s \
+        -w \
+        -X github.com/ptrvsrg/casdoor-operator/internal/version.AppVersion=${ARTIFACT_VERSION:-0.0.1} \
+        -X github.com/ptrvsrg/casdoor-operator/internal/version.GoVersion=$(go version | cut -d ' ' -f 3) \
+        -X github.com/ptrvsrg/casdoor-operator/internal/version.Platform=$(go env GOOS)/$(go env GOARCH)" \
+    ./cmd
+
+# Run the manager binary
+FROM ${RUNTIME_IMAGE_NAME:-debian}:${RUNTIME_IMAGE_VERSION:-bookworm-slim} AS runtime
+
+WORKDIR /casdoor-operator
+
+COPY --from=build /casdoor-operator/bin /casdoor-operator
+COPY config.default.yaml /casdoor-operator/config.yaml
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates tzdata \
+    && echo 'Etc/UTC' > /etc/timezone \
+    && dpkg-reconfigure -f noninteractive tzdata \
+    && adduser --disabled-password --home /casdoor-operator --gecos '' gouser \
+    && chown -R gouser /casdoor-operator \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV TZ=Etc/UTC
+ENV LANG=en_US.utf8
+ENV LC_ALL=en_US.UTF-8
+
+USER gouser
+
+ENTRYPOINT ["/casdoor-operator/manager"]

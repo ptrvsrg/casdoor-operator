@@ -1,0 +1,7 @@
+.idea/
+bin/
+build/
+hooks/
+vendor/
+README.md
+LICENSE.md

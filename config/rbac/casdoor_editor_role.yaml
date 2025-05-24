@@ -1,0 +1,27 @@
+# permissions for end users to edit casdoors.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: casdoor-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: casdoor-editor-role
+rules:
+- apiGroups:
+  - casdoor.ptrvsrg.github.com
+  resources:
+  - casdoors
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - casdoor.ptrvsrg.github.com
+  resources:
+  - casdoors/status
+  verbs:
+  - get

@@ -1,0 +1,16 @@
+{{- if and .Values.rbac.create .Values.serviceAccount.create .Values.globalResources.create -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "casdoor-operator.fullname" . }}-rolebinding
+  labels:
+    {{- include "casdoor-operator.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "casdoor-operator.fullname" . }}-role
+subjects:
+- kind: ServiceAccount
+  name: {{ include "casdoor-operator.serviceAccountName" . }}
+  namespace: {{ .Release.Namespace }}
+{{- end }}

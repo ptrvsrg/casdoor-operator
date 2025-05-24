@@ -1,0 +1,148 @@
+# Default values for casdoor-operator.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicas: 1
+
+image:
+  registry: ghcr.io
+  repository: ptrvsrg
+  name: casdoor-operator
+  pullPolicy: IfNotPresent
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+service:
+  type: ClusterIP
+  metricsPort: 8080
+  probePort: 8082
+  pprofPort: 8081
+  metricsNodePort: 8080
+  probeNodePort: 8082
+  pprofNodePort: 8081
+
+selectorLabels:
+
+deploymentAnnotations: {}
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+priorityClassName:
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+resources: {}
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+revisionHistoryLimit: 10
+
+enableHTTP2: true
+
+watchNamespaces: []
+
+metrics:
+  enabled: false
+  port: 8080
+  secure: false
+
+probe:
+  enabled: false
+  port: 8082
+  readiness:
+    endpointName: readyz
+    initialDelaySeconds: 10
+    periodSeconds: 30
+  liveness:
+    endpointName: healthz
+    initialDelaySeconds: 10
+    periodSeconds: 30
+
+pprof:
+  enabled: false
+  port: 8081
+
+logging:
+  level: info
+  format: json
+
+leaderElection:
+  enabled: false
+  id: casdoor-operator-leader-election
+  namespace: default
+  retryPeriod: 2s
+  renewDeadline: 10s
+  leaseDuration: 15s
+
+globalController:
+  skipNameValidation:
+  groupKindConcurrency: {}
+  maxConcurrentReconciles: 1
+  cacheSyncTimeout: 2m
+  needLeaderElection:
+
+specificControllers:
+  casdoor:
+    skipNameValidation:
+    maxConcurrentReconciles: 1
+    cacheSyncTimeout: 2m
+    needLeaderElection:
+    healthCheckMethod: GET
+    healthCheckPath: /
+    healthCheckInterval: 1m
+    healthCheckTimeout: 1m
+    healthCheckAttempts: 3
+
+extraEnvs: []
+
+extraVolumes: []
+
+extraVolumeMounts: []
+
+extraArgs: []
+
+extraInitContainers: []
+
+extraContainers: []
+
+globalResources:
+  create: true
+
+rbac:
+  create: true
+
+podDisruptionBudget:
+  create: true
+  minAvailable: 1
+  #  maxUnavailable:
