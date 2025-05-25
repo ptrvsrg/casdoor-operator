@@ -29,11 +29,11 @@ service:
   metricsPort: 8080
   probePort: 8082
   pprofPort: 8081
-  metricsNodePort: 8080
-  probeNodePort: 8082
-  pprofNodePort: 8081
+  metricsNodePort: 30080
+  probeNodePort: 30082
+  pprofNodePort: 30081
 
-selectorLabels:
+selectorLabels: {}
 
 deploymentAnnotations: {}
 
@@ -42,7 +42,7 @@ podAnnotations: {}
 podSecurityContext: {}
   # fsGroup: 2000
 
-priorityClassName:
+priorityClassName: ""
 
 securityContext: {}
   # capabilities:
@@ -55,7 +55,7 @@ securityContext: {}
 resources: {}
 
 autoscaling:
-  enabled: true
+  enabled: false
   minReplicas: 1
   maxReplicas: 100
   targetCPUUtilizationPercentage: 80

@@ -1,0 +1,11 @@
+{{- if .Values.initData.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ printf "%s-init-data" (include "casdoor.fullname" .) }}
+  labels:
+    {{- include "casdoor.labels" . | nindent 4 }}
+data:
+  init_data.json: |
+    {{ .Values.initData.content | toJson }}
+{{- end }}

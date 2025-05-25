@@ -1,0 +1,151 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "casdoor.fullname" . }}
+  {{- with .Values.deploymentAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "casdoor.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  {{- if .Values.revisionHistoryLimit }}
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "casdoor.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "casdoor.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "casdoor.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- with .Values.initContainers }}
+      initContainers:
+        {{- toYaml | nindent 8 }}
+      {{- end }}
+      priorityClassName: {{ .Values.priorityClassName | quote }}
+      containers:
+        - name: casdoor
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: {{ include "casdoor.image" . | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: RUNNING_IN_DOCKER
+              value: "true"
+          {{- with .Values.extraEnvs }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.envFromSecret }}
+            {{ include "casdoor.envFromSecret" .Values.envFromSecret | indent 12 | trim }}
+          {{- end -}}
+          {{ if .Values.envFromConfigmap }}
+            {{ include "casdoor.envFromConfigmap" .Values.envFromConfigmap | indent 12 | trim }}
+          {{- end }}
+          {{- with .Values.extraEnvsFrom }}
+          envFrom:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.app.httpPort }}
+              protocol: TCP
+            {{- if .Values.ldap.enabled }}
+            - name: ldap
+              containerPort: {{ .Values.ldap.serverPort }}
+              protocol: TCP
+            {{- end }}
+            {{- if .Values.ldaps.enabled }}
+            - name: ldaps
+              containerPort: {{ .Values.ldaps.serverPort }}
+              protocol: TCP
+            {{- end }}
+            {{- if .Values.radius.enabled }}
+            - name: radius
+              containerPort: {{ .Values.radius.serverPort }}
+              protocol: TCP
+            {{- end }}
+          {{- if .Values.probe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.probe.livenessEndpoint }}
+              port: http
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.probe.readinessEndpoint }}
+              port: http
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: config-volume
+              mountPath: /conf
+          {{- if .Values.initData.enabled }}
+            - name: init-data-volume
+              mountPath: /setup
+          {{- end }}
+          {{- if or (eq .Values.database.driver "sqlite") (eq .Values.database.driver "") }}
+            - name: sqlite-storage
+              mountPath: /data
+          {{- end }}
+          {{- if .Values.extraVolumeMounts }}
+            {{- toYaml .Values.extraVolumeMounts | nindent 12 }}
+          {{- end }}
+      {{- with .Values.extraContainers }}
+        {{- toYaml | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: config-volume
+          projected:
+            defaultMode: 420
+            sources:
+              - configMap:
+                  name: {{ printf "%s-config" (include "casdoor.fullname" .) }}
+                  items:
+                    - key: app.conf
+                      path: app.conf
+      {{- if .Values.initData.enabled }}
+        - name: init-data-volume
+          projected:
+            defaultMode: 420
+            sources:
+              - configMap:
+                  name: {{ printf "%s-init-data" (include "casdoor.fullname" .) }}
+                  items:
+                    - key: init_data.json
+                      path: init_data.json
+      {{- end }}
+      {{- if or (eq .Values.database.driver "sqlite") (eq .Values.database.driver "") }}
+        - name: sqlite-storage
+          emptyDir: {}
+      {{- end }}
+      {{- if .Values.extraVolumes }}
+        {{- toYaml .Values.extraVolumes | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
