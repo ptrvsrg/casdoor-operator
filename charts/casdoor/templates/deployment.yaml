@@ -36,7 +36,7 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       {{- with .Values.initContainers }}
       initContainers:
-        {{- toYaml | nindent 8 }}
+        {{- toYaml . | nindent 8 }}
       {{- end }}
       priorityClassName: {{ .Values.priorityClassName | quote }}
       containers:
@@ -107,7 +107,7 @@ spec:
             {{- toYaml .Values.extraVolumeMounts | nindent 12 }}
           {{- end }}
       {{- with .Values.extraContainers }}
-        {{- toYaml | nindent 8 }}
+        {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
         - name: config-volume

@@ -115,7 +115,7 @@ app:
   SessionOn: true
   copyRequestBody: true
   isUsernameLowered: false
-  staticBaseUrl: "https://cdn.casbin.org "
+  staticBaseUrl: "https://cdn.casbin.org"
   batchSize: 100
   enableErrorMask: false
   enableGzip: true
