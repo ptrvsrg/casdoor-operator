@@ -49,7 +49,7 @@ jobs:
         run: helm package casdoor -d build
       - name: Package Casdoor Operator charts
         working-directory: charts
-        run: helm package casdoor-operator -d build --app-version ${{ github.ref }}
+        run: helm package casdoor-operator -d build --app-version ${{ github.ref_name }}
       - name: Index charts
         working-directory: charts
         run: helm repo index build --url https://ptrvsrg.github.io/casdoor-operator/charts
