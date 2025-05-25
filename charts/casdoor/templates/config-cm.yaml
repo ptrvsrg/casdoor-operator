@@ -1,0 +1,48 @@
+{{- $filteredLog := dict }}
+{{- range $key, $value := .Values.log }}
+  {{- if and (ne $key "showSql") (ne $key "logPostOnly") }}
+    {{- $_ := set $filteredLog $key $value }}
+  {{- end }}
+{{- end }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ printf "%s-config" (include "casdoor.fullname" .) }}
+  labels:
+    {{- include "casdoor.labels" . | nindent 4 }}
+data:
+  app.conf: |
+    {{- range $key, $value := .Values.app }}
+    {{ $key }} = {{ $value }}
+    {{- end }}
+    driverName = {{ .Values.database.driver }}
+    dataSourceName = {{ include "casdoor.dataSourceName" . }}
+    dbName = {{ .Values.database.dbName }}
+    tableNamePrefix = {{ .Values.database.tableNamePrefix }}
+    {{- if .Values.redis.enabled }}
+    redisEndpoint = {{ .Values.redis.endpoint }}
+    {{- end }}
+    {{- if .Values.ldap.enabled }}
+    ldapServerPort = {{ .Values.ldap.serverPort }}
+    {{- end }}
+    {{- if .Values.ldaps.enabled }}
+    ldapsCertId = {{ .Values.ldaps.certId }}
+    ldapsServerPort = {{ .Values.ldaps.serverPort }}
+    {{- end }}
+    {{- if .Values.radius.enabled }}
+    radiusServerPort = {{ .Values.radius.serverPort }}
+    radiusDefaultOrganization = {{ .Values.radius.defaultOrganization }}
+    radiusSecret = {{ .Values.radius.secret }}
+    {{- end }}
+    {{- if .Values.proxy.enabled }}
+    socks5Proxy = {{- .Values.proxy.url }}
+    {{- end }}
+    quota = {{ .Values.quota | toJson }}
+    logConfig = {{ $filteredLog | toJson }}
+    showSql = {{ .Values.log.showSql }}
+    logPostOnly = {{ .Values.log.logPostOnly }}
+    frontendBaseDir = {{ .Values.frontend.baseDir }}
+    {{- if .Values.initData.enabled }}
+    initDataNewOnly = {{ .Values.initData.newOnly }}
+    initDataFile = /setup/init_data.json
+    {{- end }}

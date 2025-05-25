@@ -1,0 +1,15 @@
+apiVersion: v2
+name: casdoor
+description: A Helm chart for Casdoor
+type: application
+version: 0.0.1
+appVersion: v1.919.0
+icon: https://avatars.githubusercontent.com/u/72992104?s=200&v=4
+keywords:
+  - casdoor
+  - sso
+  - auth
+sources:
+  - https://github.com/ptrvsrg/casdoor-operator
+maintainers:
+  - name: ptrvsrg
