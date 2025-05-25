@@ -118,11 +118,6 @@ specificControllers:
     maxConcurrentReconciles: 1
     cacheSyncTimeout: 2m
     needLeaderElection:
-    healthCheckMethod: GET
-    healthCheckPath: /
-    healthCheckInterval: 1m
-    healthCheckTimeout: 1m
-    healthCheckAttempts: 3
 
 extraEnvs: []
 
