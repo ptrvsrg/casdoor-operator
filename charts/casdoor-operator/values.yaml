@@ -72,6 +72,8 @@ enableHTTP2: true
 
 watchNamespaces: []
 
+customResourceSelector: ""
+
 metrics:
   enabled: false
   port: 8080

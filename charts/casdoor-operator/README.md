@@ -43,14 +43,15 @@ The following tables list the configurable parameters of the Casdoor Operator He
 
 ### Global Configuration
 
-| Parameter              | Description                                    | Default Value |
-|------------------------|------------------------------------------------|---------------|
-| `replicas`             | Number of replicas for the operator deployment | `1`           |
-| `nameOverride`         | Override the name of the chart                 | `""`          |
-| `fullnameOverride`     | Override the full name of the chart            | `""`          |
-| `revisionHistoryLimit` | Number of old ReplicaSets to retain            | `10`          |
-| `enableHTTP2`          | Enable HTTP/2 support                          | `true`        |
-| `watchNamespaces`      | List of namespaces the operator should watch   | `[]`          |
+| Parameter                | Description                                    | Default Value |
+|--------------------------|------------------------------------------------|---------------|
+| `replicas`               | Number of replicas for the operator deployment | `1`           |
+| `nameOverride`           | Override the name of the chart                 | `""`          |
+| `fullnameOverride`       | Override the full name of the chart            | `""`          |
+| `revisionHistoryLimit`   | Number of old ReplicaSets to retain            | `10`          |
+| `enableHTTP2`            | Enable HTTP/2 support                          | `true`        |
+| `watchNamespaces`        | List of namespaces the operator should watch   | `[]`          |
+| `customResourceSelector` | Selector for custom resources                  | `""`          |
 
 ---
 

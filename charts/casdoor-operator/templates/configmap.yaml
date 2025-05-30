@@ -8,6 +8,7 @@ data:
   config.yaml: |-
     enableHTTP2: {{ .Values.enableHTTP2 }}
     watchNamespaces: {{ join "," .Values.watchNamespaces | quote }}
+    customResourceSelector: {{ .Values.customResourceSelector | quote }}
     metrics:
       {{- toYaml .Values.metrics | nindent 6 }}
     probe:

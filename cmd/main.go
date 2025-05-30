@@ -29,7 +29,7 @@ import (
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/samber/lo"
 	"go.uber.org/zap"
-	"resty.dev/v3"
+	"k8s.io/apimachinery/pkg/labels"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	kconfig "sigs.k8s.io/controller-runtime/pkg/config"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
@@ -185,9 +185,16 @@ func runManager(ctx context.Context, command *cli.Command) error { //nolint:cycl
 		},
 	)
 
+	// Parse custom resource selector
+	labelSet, err := labels.ConvertSelectorToLabelsMap(cfg.CustomResourceSelector)
+	if err != nil {
+		return fmt.Errorf("failed to parse custom resource selector: %w", err)
+	}
+
 	// Setup cache
 	cacheOpts := cache.Options{
-		DefaultNamespaces: make(map[string]cache.Config),
+		DefaultNamespaces:    make(map[string]cache.Config),
+		DefaultLabelSelector: labelSet.AsSelector(),
 	}
 	for _, namespace := range strings.Split(cfg.WatchNamespaces, ",") {
 		cacheOpts.DefaultNamespaces[namespace] = cache.Config{}
