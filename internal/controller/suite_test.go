@@ -37,10 +37,8 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	"github.com/ptrvsrg/casdoor-operator/config"
-	httpclient "github.com/ptrvsrg/casdoor-operator/internal/http/client"
-
 	casdoorv1alpha1 "github.com/ptrvsrg/casdoor-operator/api/v1alpha1"
+	"github.com/ptrvsrg/casdoor-operator/config"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -98,10 +96,6 @@ var _ = BeforeSuite(
 
 		k8sClient, err = client.New(cfg, client.Options{Scheme: scheme.Scheme})
 		Expect(err).ToNot(HaveOccurred())
-
-		httpClient, err = httpclient.New()
-		Expect(err).NotTo(HaveOccurred())
-		Expect(httpClient).NotTo(BeNil())
 
 		appCfg = config.Config{
 			SpecificControllers: config.SpecificControllersConfig{

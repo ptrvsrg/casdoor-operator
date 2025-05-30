@@ -19,16 +19,12 @@ package controller
 import (
 	"context"
 	"fmt"
-	url2 "net/url"
-	"path"
-	"time"
 
 	"go.uber.org/zap"
 	v1 "k8s.io/api/core/v1"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/tools/record"
-	"resty.dev/v3"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
@@ -44,21 +40,19 @@ import (
 // CasdoorReconciler reconciles a Casdoor object
 type CasdoorReconciler struct {
 	client.Client
-	Scheme     *runtime.Scheme
-	logger     *zap.Logger
-	cfg        config.CasdoorControllerConfig
-	httpClient *resty.Client
-	recorder   record.EventRecorder
+	Scheme   *runtime.Scheme
+	logger   *zap.Logger
+	cfg      config.CasdoorControllerConfig
+	recorder record.EventRecorder
 }
 
 func NewCasdoorReconciler(
-	client client.Client, scheme *runtime.Scheme, cfg config.CasdoorControllerConfig, httpClient *resty.Client,
+	client client.Client, scheme *runtime.Scheme, cfg config.CasdoorControllerConfig,
 ) *CasdoorReconciler {
 	return &CasdoorReconciler{
-		Client:     client,
-		Scheme:     scheme,
-		cfg:        cfg,
-		httpClient: httpClient,
+		Client: client,
+		Scheme: scheme,
+		cfg:    cfg,
 	}
 }
 
@@ -91,15 +85,15 @@ func (r *CasdoorReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	// Setup RequeueAfter
-	var requeueAfter time.Duration
-	if casdoor.Spec.Healthcheck != nil && casdoor.Spec.Healthcheck.Enabled {
-		requeueAfter = casdoor.Spec.Healthcheck.Interval.Duration
-	}
-
 	// Delete Casdoor
 	if !casdoor.ObjectMeta.DeletionTimestamp.IsZero() {
 		return r.delete(ctx, casdoor)
+	}
+
+	// Add finalizer
+	if err := r.addFinalizer(ctx, casdoor); err != nil {
+		r.logger.Error("failed to add finalizer", zap.Error(err))
+		return ctrl.Result{}, err
 	}
 
 	// Skip reconcile
@@ -108,34 +102,9 @@ func (r *CasdoorReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, nil
 	}
 
-	// Add finalizer
-	if err := r.addFinalizer(ctx, casdoor); err != nil {
-		r.logger.Error("failed to add finalizer", zap.Error(err))
-		return ctrl.Result{RequeueAfter: requeueAfter}, err
-	}
-
-	// Check health
-	if err := r.checkHealth(ctx, casdoor); err != nil {
-		// Error health
-		r.logger.Error("failed to check health", zap.Error(err))
-
-		if err := r.applyErrorHealthcheck(ctx, casdoor, err); err != nil {
-			r.logger.Error("failed to apply error healthcheck", zap.Error(err))
-			return ctrl.Result{RequeueAfter: requeueAfter}, err
-		}
-
-		return ctrl.Result{RequeueAfter: requeueAfter}, err
-	}
-
-	// Successful health
-	if err := r.applySuccessfulHealthcheck(ctx, casdoor); err != nil {
-		r.logger.Error("failed to apply successful healthcheck", zap.Error(err))
-		return ctrl.Result{RequeueAfter: requeueAfter}, err
-	}
-
 	logger.Info("reconcile Casdoor successfully")
 
-	return ctrl.Result{RequeueAfter: requeueAfter}, nil
+	return ctrl.Result{}, nil
 }
 
 func (r *CasdoorReconciler) delete(ctx context.Context, casdoor *casdoorv1alpha1.Casdoor) (ctrl.Result, error) {
@@ -158,7 +127,7 @@ func (r *CasdoorReconciler) delete(ctx context.Context, casdoor *casdoorv1alpha1
 func (r *CasdoorReconciler) addFinalizer(ctx context.Context, casdoor *casdoorv1alpha1.Casdoor) error {
 	if controllerutil.AddFinalizer(casdoor, buildDefaultFinalizerName(casdoor)) {
 		if err := r.Status().Update(ctx, casdoor); err != nil {
-			r.logger.Error("failed to add finalizer", zap.Error(err))
+			r.logger.Error("failed to add Casdoor finalizer", zap.Error(err))
 			return err
 		}
 	}
@@ -166,90 +135,16 @@ func (r *CasdoorReconciler) addFinalizer(ctx context.Context, casdoor *casdoorv1
 	return nil
 }
 
-func (r *CasdoorReconciler) checkHealth(ctx context.Context, casdoor *casdoorv1alpha1.Casdoor) error {
-	if casdoor.Spec.Healthcheck == nil || !casdoor.Spec.Healthcheck.Enabled {
-		return nil
-	}
-
-	url, err := url2.Parse(casdoor.Spec.URL)
-	if err != nil {
-		return fmt.Errorf("failed to parse url: %w", err)
-	}
-
-	url.Path = path.Join(url.Path, casdoor.Spec.Healthcheck.Path)
-
-	r.logger.Debug(
-		"send health check request",
-		zap.String("url", url.String()),
-		zap.String("method", casdoor.Spec.Healthcheck.Method),
-	)
-	res, err := r.httpClient.
-		R().
-		SetContext(ctx).
-		SetRetryCount(casdoor.Spec.Healthcheck.Retries).
-		SetTimeout(casdoor.Spec.Healthcheck.Timeout.Duration).
-		Execute(casdoor.Spec.Healthcheck.Method, url.String())
-
-	if err != nil {
-		return fmt.Errorf("failed to check health: %w", err)
-	}
-
-	if res.IsError() {
-		return fmt.Errorf(
-			"failed to check health: status code not success: status=%s body=%s",
-			res.Status(),
-			res.String(),
-		)
-	}
-
-	return nil
-}
-
-func (r *CasdoorReconciler) applySuccessfulHealthcheck(ctx context.Context, casdoor *casdoorv1alpha1.Casdoor) error {
-	// Send event
-	r.recorder.Eventf(casdoor, v1.EventTypeNormal, "Ready", "Casdoor %s is ready", casdoor.Name)
-
-	// Update status
-	casdoor.Status.Code = casdoorv1alpha1.CasdoorStatusReady
-	casdoor.Status.Reason = ""
-	if err := r.Status().Update(ctx, casdoor); err != nil {
-		r.logger.Error("failed to update status", zap.Error(err))
-		return err
-	}
-
-	return nil
-}
-
-func (r *CasdoorReconciler) applyErrorHealthcheck(
-	ctx context.Context, casdoor *casdoorv1alpha1.Casdoor, healthCheckError error,
-) error {
-	// Send event
-	r.recorder.Eventf(
-		casdoor,
-		v1.EventTypeWarning,
-		"Failed",
-		"Casdoor %s is failed: %s",
-		casdoor.Name,
-		healthCheckError.Error(),
-	)
-
-	// Update status
-	casdoor.Status.Code = casdoorv1alpha1.CasdoorStatusFailed
-	casdoor.Status.Reason = healthCheckError.Error()
-	if err := r.Status().Update(ctx, casdoor); err != nil {
-		r.logger.Error("failed to update status", zap.Error(err))
-		return err
-	}
-
-	return nil
-}
-
 // SetupWithManager sets up the controller with the Manager.
 func (r *CasdoorReconciler) SetupWithManager(_ context.Context, mgr ctrl.Manager) error {
-	r.recorder = mgr.GetEventRecorderFor((&casdoorv1alpha1.Casdoor{}).GetResourceKind().String())
+	r.recorder = mgr.GetEventRecorderFor(
+		(&casdoorv1alpha1.Casdoor{}).GetResourceKind().String(),
+	)
 
 	err := ctrl.NewControllerManagedBy(mgr).
-		For(&casdoorv1alpha1.Casdoor{}).
+		For(
+			&casdoorv1alpha1.Casdoor{},
+		).
 		WithOptions(
 			controller.Options{
 				SkipNameValidation:      r.cfg.SkipNameValidation,
@@ -258,7 +153,9 @@ func (r *CasdoorReconciler) SetupWithManager(_ context.Context, mgr ctrl.Manager
 				NeedLeaderElection:      r.cfg.NeedLeaderElection,
 			},
 		).
-		WithEventFilter(predicate.GenerationChangedPredicate{}).
+		WithEventFilter(
+			predicate.GenerationChangedPredicate{},
+		).
 		Complete(r)
 	if err != nil {
 		return fmt.Errorf("failed to create application controller: %w", err)

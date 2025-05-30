@@ -79,7 +79,6 @@ var _ = Describe(
 							k8sClient,
 							k8sClient.Scheme(),
 							appCfg.SpecificControllers.Casdoor,
-							httpClient,
 						)
 
 						err := controllerReconciler.SetupWithManager(ctx, mgr)
