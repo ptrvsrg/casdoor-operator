@@ -26,7 +26,6 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"resty.dev/v3"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 
@@ -48,7 +47,6 @@ import (
 var cfg *rest.Config
 var mgr ctrl.Manager
 var k8sClient client.Client
-var httpClient *resty.Client
 var appCfg config.Config
 var testEnv *envtest.Environment
 var ctx context.Context
@@ -115,8 +113,6 @@ var _ = BeforeSuite(
 				},
 			),
 		)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(httpClient).NotTo(BeNil())
 
 		go func() {
 			defer GinkgoRecover()
