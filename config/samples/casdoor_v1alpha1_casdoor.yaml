@@ -1,23 +1,32 @@
+---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: casdoor-admin-credentials
+  name: casdoor-test-secret
   labels:
     app.kubernetes.io/name: casdoor-operator
-    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/instance: test
 type: Opaque
 data:
-  username: YWRtaW4K
-  password: MTIzCg==
+  clientSecret: ZXhhbXBsZS1jbGllbnQtc2VjcmV0Cg==
+  jwtCertificate: |-
+    LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCiAgICAgICAgICBNSUlEYXpDQ0FsT2dBd0lCQWdJVWZZeUVzQ1V0VEpNdHdUVXVER0tCbGxBN0ZmSXdEUVlKS29aSWh2Y05BUUVMCiAgICAgICAgICBCUUF3UlRFTE1Ba0dBMVVFQmhNQ1FWVXhFekFSQmdOVkJBZ01DbE52YldVdFUzUmhkR1V4SVRBZkJnTlZCQW9NCiAgICAgICAgICBHRWx1ZEdWeWJtVjBJRmRwWkdkcGRITWdVSFI1SUV4MFpEQWVGdzB5TlRBMU1qZ3dNekE1TkRCYUZ3MHlOakExCiAgICAgICAgICBNamd3TXpBNU5EQmFNRVV4Q3pBSkJnTlZCQVlUQWtGVk1STXdFUVlEVlFRSURBcFRiMjFsTFZOMFlYUmxNU0V3CiAgICAgICAgICBId1lEVlFRS0RCaEpiblJsY201bGRDQlhhV1JuYVhSeklGQjBlU0JNZEdRd2dnRWlNQTBHQ1NxR1NJYjNEUUVCCiAgICAgICAgICBBUVVBQTRJQkR3QXdnZ0VLQW9JQkFRQ1o0bWNyTVkrL3JzYlE5QTF3TmNRdHdqRThXWHlROXNhZVR3NGRUNDBBCiAgICAgICAgICBkOVBGcEVBUm4zanU0ZFgydXNYSm1WbTFJNDMzZ2dxRzRRcHNkeGwrY3hlV1NsZGI2djZyaGNTb3Jhb21zVE42CiAgICAgICAgICBYak9JZG9NUVdBcEhpS3VTYUlSN05jd1FGQTF6d2oxUVNncHQyeWgrU3dXUFdiSlZEYW05dXlzRUoweDlNRmJPCiAgICAgICAgICBRU1ZwaS9tcW5jcEo2M0FBUnNiVU1tNEJRTTBtdm1FL3M5Vy9rQXd4WHRRUWZhVHpJUG1sbXp3UmxRNGFOcUpmCiAgICAgICAgICA2WlV6M1hOOE03MHpLeVhDbzhLN3NSbGFyenNBc3F1RnRRbnZNRE41WnZnZ1Z6M0FqcXdpZFN6TE0reTAxOGxQCiAgICAgICAgICBWRE5Dbll3Q2h1dnpGTHBpOGg1aGowam5vVTlHRERoUjQ2Y3JXWG1Qc0ZjQkFnTUJBQUdqVXpCUk1CMEdBMVVkCiAgICAgICAgICBEZ1FXQkJRNllMKytGbVpQVG5FdFZtOTR5MFpUMlNtQVBqQWZCZ05WSFNNRUdEQVdnQlE2WUwrK0ZtWlBUbkV0CiAgICAgICAgICBWbTk0eTBaVDJTbUFQakFQQmdOVkhSTUJBZjhFQlRBREFRSC9NQTBHQ1NxR1NJYjNEUUVCQ3dVQUE0SUJBUUJCCiAgICAgICAgICBXcS80ZFdqRk5lMXVpQ29yREpxb3I3bUFMbHc3U1ZSK1J3SUhZdDh1K2c3RG85NW1IWEw3SFd5V1h1U3MvWEN3CiAgICAgICAgICA2elByb2RWR3pJRUFIWVprazVnV3UvQ00xTzl0NFdra3hMNVdVbnNpYWI1eTAyUXgxOGMvSDVhVTRvWEFZQ2tpCiAgICAgICAgICBLQi9HblMzcjM3S2ErZHE0YUZzRlNkVmpQZW1GeGNrOUNzUnJMb29DZGxoZWY5TTlPbmpsQmFJQ040blFpRnlKCiAgICAgICAgICBFWDJxWXhIMngyRzBFVXhFZ29GeTVVUHZLZ21MQ1pqdmJQcVVJaTBqaTNHUXptVTN6VGhwdEwvTENhY1o1V1pCCiAgICAgICAgICBEQ0xUekgraFpvQlYwM0VremVCMyt5NGpocnNSYS9TMzBKSXdhNjJoS2NaZ3B2djB5MHhmdnYwaGxQWi9oZ0NPCiAgICAgICAgICBsZmFFZUV0ZW1pdGJjWEtSdnNaVgogICAgICAgICAgLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
 ---
 apiVersion: casdoor.ptrvsrg.github.com/v1alpha1
 kind: Casdoor
 metadata:
   labels:
     app.kubernetes.io/name: casdoor-operator
-    app.kubernetes.io/managed-by: kustomize
-  name: casdoor-sample
+    app.kubernetes.io/instance: test
+  name: casdoor-test
 spec:
-  adminCredentialsSecret:
-    name: casdoor-admin-credentials
-  url: http://casdoor-casdoor-helm-charts.default.svc.cluster.local:8000
+  url: http://test-casdoor.default.svc.cluster.local:8000
+  organizationName: example-org
+  applicationName: example-app
+  clientID: example-client-id
+  clientSecret:
+    key: clientSecret
+    name: casdoor-test-secret
+  jwtCertificate:
+    key: jwtCertificate
+    name: casdoor-test-secret

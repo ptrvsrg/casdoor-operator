@@ -1,0 +1,256 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-casdoor-config
+  labels:
+    app.kubernetes.io/name: casdoor
+    app.kubernetes.io/instance: test
+data:
+  app.conf: |-
+    SessionOn = true
+    batchSize = 100
+    copyRequestBody = true
+    enableErrorMask = false
+    enableGzip = true
+    httpPort = 8000
+    inactiveTimeoutMinutes = 1440
+    initScore = 0
+    isUsernameLowered = false
+    mode = dev
+    name = casdoor
+    origin = 
+    originFrontend = 
+    staticBaseUrl = https://cdn.casbin.org
+    verificationCodeTimeout = 10
+    driverName = sqlite
+    dataSourceName = file:/data/casdoor.db?cache=shared
+    dbName = casdoor
+    tableNamePrefix = 
+    quota = {"application":-1,"organization":-1,"provider":-1,"user":-1}
+    logConfig = {"adapter":"file","filename":"logs/casdoor.log","maxDays":30,"perm":"0770"}
+    showSql = true
+    logPostOnly = false
+    frontendBaseDir = ../cc_0
+    initDataNewOnly = false
+    initDataFile = /setup/init_data.json
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-casdoor-init-data
+  labels:
+    app.kubernetes.io/name: casdoor
+    app.kubernetes.io/instance: test
+data:
+  init_data.json: |-
+    {
+      "applications": [
+        {
+          "cert": "example-cert",
+          "clientId": "example-client-id",
+          "clientSecret": "example-client-secret",
+          "createdTime": "2023-10-01T00:00:00Z",
+          "description": "This is an example application for Casdoor.",
+          "displayName": "Example Application",
+          "enablePassword": true,
+          "enableSignUp": true,
+          "enableSigninSession": true,
+          "expireInHours": 24,
+          "homepageUrl": "https://casdoor.org",
+          "logo": "https://casdoor.org/img/casdoor.png",
+          "name": "example-app",
+          "organization": "example-org",
+          "owner": "example-org",
+          "providers": [],
+          "redirectUris": [
+            "https://casdoor.org/callback"
+          ],
+          "refreshExpireInHours": 720,
+          "signupItems": [
+            {
+              "name": "Username",
+              "required": true,
+              "visible": true
+            },
+            {
+              "name": "Password",
+              "required": true,
+              "visible": true
+            },
+            {
+              "name": "Email",
+              "required": true,
+              "visible": true
+            }
+          ],
+          "tokenFormat": "JWT"
+        }
+      ],
+      "certs": [
+        {
+          "certificate": "-----BEGIN CERTIFICATE-----\nMIIDazCCAlOgAwIBAgIUfYyEsCUtTJMtwTUuDGKBllA7FfIwDQYJKoZIhvcNAQEL\nBQAwRTELMAkGA1UEBhMCQVUxEzARBgNVBAgMClNvbWUtU3RhdGUxITAfBgNVBAoM\nGEludGVybmV0IFdpZGdpdHMgUHR5IEx0ZDAeFw0yNTA1MjgwMzA5NDBaFw0yNjA1\nMjgwMzA5NDBaMEUxCzAJBgNVBAYTAkFVMRMwEQYDVQQIDApTb21lLVN0YXRlMSEw\nHwYDVQQKDBhJbnRlcm5ldCBXaWRnaXRzIFB0eSBMdGQwggEiMA0GCSqGSIb3DQEB\nAQUAA4IBDwAwggEKAoIBAQCZ4mcrMY+/rsbQ9A1wNcQtwjE8WXyQ9saeTw4dT40A\nd9PFpEARn3ju4dX2usXJmVm1I433ggqG4Qpsdxl+cxeWSldb6v6rhcSoraomsTN6\nXjOIdoMQWApHiKuSaIR7NcwQFA1zwj1QSgpt2yh+SwWPWbJVDam9uysEJ0x9MFbO\nQSVpi/mqncpJ63AARsbUMm4BQM0mvmE/s9W/kAwxXtQQfaTzIPmlmzwRlQ4aNqJf\n6ZUz3XN8M70zKyXCo8K7sRlarzsAsquFtQnvMDN5ZvggVz3AjqwidSzLM+y018lP\nVDNCnYwChuvzFLpi8h5hj0jnoU9GDDhR46crWXmPsFcBAgMBAAGjUzBRMB0GA1Ud\nDgQWBBQ6YL++FmZPTnEtVm94y0ZT2SmAPjAfBgNVHSMEGDAWgBQ6YL++FmZPTnEt\nVm94y0ZT2SmAPjAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3DQEBCwUAA4IBAQBB\nWq/4dWjFNe1uiCorDJqor7mALlw7SVR+RwIHYt8u+g7Do95mHXL7HWyWXuSs/XCw\n6zProdVGzIEAHYZkk5gWu/CM1O9t4WkkxL5WUnsiab5y02Qx18c/H5aU4oXAYCki\nKB/GnS3r37Ka+dq4aFsFSdVjPemFxck9CsRrLooCdlhef9M9OnjlBaICN4nQiFyJ\nEX2qYxH2x2G0EUxEgoFy5UPvKgmLCZjvbPqUIi0ji3GQzmU3zThptL/LCacZ5WZB\nDCLTzH+hZoBV03EkzeB3+y4jhrsRa/S30JIwa62hKcZgpvv0y0xfvv0hlPZ/hgCO\nlfaEeEtemitbcXKRvsZV\n-----END CERTIFICATE-----",
+          "createdTime": "2023-10-01T00:00:00Z",
+          "name": "example-cert",
+          "owner": "example-org",
+          "privateKey": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCZ4mcrMY+/rsbQ\n9A1wNcQtwjE8WXyQ9saeTw4dT40Ad9PFpEARn3ju4dX2usXJmVm1I433ggqG4Qps\ndxl+cxeWSldb6v6rhcSoraomsTN6XjOIdoMQWApHiKuSaIR7NcwQFA1zwj1QSgpt\n2yh+SwWPWbJVDam9uysEJ0x9MFbOQSVpi/mqncpJ63AARsbUMm4BQM0mvmE/s9W/\nkAwxXtQQfaTzIPmlmzwRlQ4aNqJf6ZUz3XN8M70zKyXCo8K7sRlarzsAsquFtQnv\nMDN5ZvggVz3AjqwidSzLM+y018lPVDNCnYwChuvzFLpi8h5hj0jnoU9GDDhR46cr\nWXmPsFcBAgMBAAECggEAAeX9oNZJMDOvRzejjM1VAL2DDvwJod4xgBV4lpr7IdTY\nm3kVw0Hk44mMsrEGLKEELsxj/Xgwug4/qyvi+CDiWxvKrRseji4lyXDvBvArsuhD\nmXzgzAxSACTq/PDmJYD55f7hVZrBV+K58zX/b2Nsi6KvJQZ4oBsVgkUb1/WHNJ8r\nNT3egSxr+cnvwaN3Di1qJMkxYdW7OKYFTnFUN9kDAzi/jcUqz8AzmO2H1j6Y6l9h\nk2NdJ/FTixZlxwj2SlI0c5aPwqwTHP3v294oQiP1puoOy0mLZ+8yPyLhLZBUKqLk\nF2+tt9FtXSCleqWuiUK8NRTyZINWCfyK0iDW85CYAQKBgQDYJyiE/mm1FQDmB4nl\nQU2bD2+vt/iEk4kfC/CisROX7B974bTsC/+PSc6S1AHwiiZCf8n8aQNEgODSQ8m+\nR9zGITgfbWKqljgDozBzMzLrZWmQEanK4Cq4PF3+2WlSnmdWgbwgqiA0dNB6plEb\nzNTL+HXwaDr9ptrrYAjEY1ejwQKBgQC2QJ9hWCj0DTTGlWcC7wtaFaX/0Yb99RMj\nekTNqREtL68hx5NyyoYxF9f4kytNoRuFwTxMEuDXjl7zQnToVyzlk2K7j5CqUIV2\ncp+ct31qpxKAIv39w0mbPZQgsfM4KqdJ45/8NQzkmLPUTenvwmV7QC3paEXkmW9i\ncuxPFqSDQQKBgHz2/p0M/Q4cy30xxI5PF8/at8ZORRZYuYDChWd5motNjtIvJksF\nkMVFdXE7srdfF0mA2cTc7W+wVsoZOMySfVfqoqjAs7dNy6qGsR8Y7YpcAhCxtYk9\n2lTTScBp71M9kx7XOG1mDeJl2pXeC6xX2nrl9UF88QXubkiAJ/FqQaPBAoGAX+wB\nNp3M6C4vMbmefvfLdL1iIhNoRi9/xDNtFQU/yhWHynKdE1SubhZLkEP9DZ2Wu74p\neyyQdEM1jDjVCRggxC/fTjJQhKNeqynHAhe9Ba4rWY+ROMdY7UDqvo6KIWypoYUR\nRg+x2nrYYwwi7RLWkJkF0QwVhSyQaDNuVm3nZkECgYAaHW0v0MuKRXKAhqLV+hxX\ngHhXxbnGXutFFZbpa5uJ3q4bxtwSM6ZKc/fspNjR+mjrEA6+lAQTCGjSeTYModEJ\nJmJyp0AwdJbsNurxfe5/Q5Sx8+s0fnRAToYATi4to+mt2cDRweaKuzhHmM0Brerz\nWbrMj1WQJdDpEYxfTwTzag==\n-----END PRIVATE KEY-----"
+        }
+      ],
+      "organizations": [
+        {
+          "createdTime": "2023-10-01T00:00:00Z",
+          "defaultAvatar": "https://casdoor.org/default-avatar.png ",
+          "displayName": "Example Organization",
+          "enableSoftDeletion": true,
+          "favicon": "https://casdoor.org/favicon.ico ",
+          "masterPassword": "admin_password",
+          "name": "example-org",
+          "owner": "admin",
+          "passwordType": "plain",
+          "phonePrefix": "+1",
+          "tags": [],
+          "websiteUrl": "https://casdoor.org "
+        }
+      ],
+      "permissions": [
+        {
+          "createdTime": "2023-10-01T00:00:00Z",
+          "description": "This is an example permission for Casdoor.",
+          "displayName": "Example Permission",
+          "name": "example-permission",
+          "owner": "example-org"
+        }
+      ],
+      "roles": [
+        {
+          "createdTime": "2023-10-01T00:00:00Z",
+          "description": "This is an example role for Casdoor.",
+          "displayName": "Example Role",
+          "name": "example-role",
+          "owner": "example-org",
+          "permissions": [
+            "example-permission"
+          ],
+          "users": [
+            "example-user"
+          ]
+        }
+      ],
+      "users": [
+        {
+          "affiliation": "Example Organization",
+          "avatar": "https://casdoor.org/user-avatar.png",
+          "createdTime": "2023-10-01T00:00:00Z",
+          "displayName": "Example User",
+          "email": "user@example.com",
+          "id": "example-user",
+          "name": "example-user",
+          "owner": "example-org",
+          "password": "user_password",
+          "permissions": [],
+          "phone": "+1234567890",
+          "roles": [
+            "example-role"
+          ],
+          "type": "normal-user"
+        }
+      ]
+    }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-casdoor
+  labels:
+    app.kubernetes.io/name: casdoor
+    app.kubernetes.io/instance: test
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8000
+      targetPort: http
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: casdoor
+    app.kubernetes.io/instance: test
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-casdoor
+  labels:
+    app.kubernetes.io/name: casdoor
+    app.kubernetes.io/instance: test
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: casdoor
+      app.kubernetes.io/instance: test
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: casdoor
+        app.kubernetes.io/instance: test
+    spec:
+      securityContext:
+        {}
+      priorityClassName: ""
+      containers:
+        - name: casdoor
+          securityContext:
+            {}
+          image: "docker.io/casbin/casdoor:v1.919.0"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: RUNNING_IN_DOCKER
+              value: "true"
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+          resources:
+            limits:
+              cpu: "4"
+              memory: 8Gi
+            requests:
+              cpu: "4"
+              memory: 8Gi
+          volumeMounts:
+            - name: config-volume
+              mountPath: /conf
+            - name: init-data-volume
+              mountPath: /setup
+            - name: sqlite-storage
+              mountPath: /data
+      volumes:
+        - name: config-volume
+          projected:
+            defaultMode: 420
+            sources:
+              - configMap:
+                  name: test-casdoor-config
+                  items:
+                    - key: app.conf
+                      path: app.conf
+        - name: init-data-volume
+          projected:
+            defaultMode: 420
+            sources:
+              - configMap:
+                  name: test-casdoor-init-data
+                  items:
+                    - key: init_data.json
+                      path: init_data.json
+        - name: sqlite-storage
+          emptyDir: {}
