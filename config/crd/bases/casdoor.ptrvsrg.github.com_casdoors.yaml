@@ -20,6 +20,9 @@ spec:
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
+    - jsonPath: .spec.url
+      name: URL
+      type: string
     - jsonPath: .metadata.creationTimestamp
       name: Age
       type: string
@@ -51,10 +54,20 @@ spec:
           spec:
             description: CasdoorSpec defines the desired state of Casdoor
             properties:
-              adminCredentialsSecret:
-                description: AdminCredentialsSecret is the secret name of Casdoor
-                  admin credentials
+              applicationName:
+                description: ApplicationName is the name of Casdoor application
+                type: string
+              clientID:
+                description: ClientID is the client ID of Casdoor
+                type: string
+              clientSecret:
+                description: ClientSecret is the secret selector of Casdoor client
+                  secret
                 properties:
+                  key:
+                    description: The key of the secret to select from.  Must be a
+                      valid secret key.
+                    type: string
                   name:
                     default: ""
                     description: |-
@@ -64,6 +77,11 @@ spec:
                       almost certainly wrong.
                       More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                     type: string
+                  optional:
+                    description: Specify whether the Secret or its key must be defined
+                    type: boolean
+                required:
+                - key
                 type: object
                 x-kubernetes-map-type: atomic
               healthcheck:
@@ -73,10 +91,6 @@ spec:
                     default: false
                     description: Enabled is the flag to enable healthcheck
                     type: boolean
-                  interval:
-                    default: 1m
-                    description: Interval of healthcheck
-                    type: string
                   method:
                     default: GET
                     description: Method of healthcheck
@@ -107,24 +121,58 @@ spec:
                 required:
                 - enabled
                 type: object
+              jwtCertificate:
+                description: JwtCertificate is the secret selector of Casdoor JWT
+                  certificate
+                properties:
+                  key:
+                    description: The key of the secret to select from.  Must be a
+                      valid secret key.
+                    type: string
+                  name:
+                    default: ""
+                    description: |-
+                      Name of the referent.
+                      This field is effectively required, but due to backwards compatibility is
+                      allowed to be empty. Instances of this type with an empty value here are
+                      almost certainly wrong.
+                      More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                    type: string
+                  optional:
+                    description: Specify whether the Secret or its key must be defined
+                    type: boolean
+                required:
+                - key
+                type: object
+                x-kubernetes-map-type: atomic
+              organizationName:
+                description: OrganizationName is the name of Casdoor organization
+                type: string
               url:
                 description: URL of Casdoor instance
                 type: string
             required:
-            - adminCredentialsSecret
+            - applicationName
+            - clientID
+            - clientSecret
+            - jwtCertificate
+            - organizationName
             - url
             type: object
           status:
             description: CasdoorStatus defines the observed state of Casdoor
             properties:
               code:
-                description: Code of Casdoor instance status
+                default: Unknown
+                description: Code is the status of Casdoor
+                enum:
+                - Ready
+                - NotReady
+                - Unknown
                 type: string
               reason:
-                description: Reason of Casdoor instance failure
+                description: Reason is the description of the NotReady status
                 type: string
-            required:
-            - code
             type: object
         type: object
     served: true

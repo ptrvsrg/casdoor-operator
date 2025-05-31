@@ -129,6 +129,12 @@ const config: Config = {
             theme: prismThemes.github,
             darkTheme: prismThemes.oneDark,
         },
+        plugins: [
+            [require.resolve("@cmfcmf/docusaurus-search-local"), {
+                indexPages: true,
+                includeParentCategoriesInPageTitle: true,
+            }],
+        ]
     } satisfies Preset.ThemeConfig,
 };
 

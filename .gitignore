@@ -430,5 +430,5 @@ bin
 config.yaml
 charts/**/values-test.yaml
 dist/
-crds/
+manifests/
 .idea/**/*

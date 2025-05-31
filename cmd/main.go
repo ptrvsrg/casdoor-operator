@@ -29,11 +29,13 @@ import (
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/samber/lo"
 	"go.uber.org/zap"
+	"k8s.io/apimachinery/pkg/labels"
 	"resty.dev/v3"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	kconfig "sigs.k8s.io/controller-runtime/pkg/config"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 
+	casdoorv1alpha1 "github.com/ptrvsrg/casdoor-operator/api/v1alpha1"
 	"github.com/ptrvsrg/casdoor-operator/config"
 	"github.com/ptrvsrg/casdoor-operator/internal/controller"
 	"github.com/ptrvsrg/casdoor-operator/internal/http/client"
@@ -52,8 +54,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/metrics/filters"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
-
-	casdoorv1alpha1 "github.com/ptrvsrg/casdoor-operator/api/v1alpha1"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -187,9 +187,17 @@ func runManager(ctx context.Context, command *cli.Command) error { //nolint:cycl
 		},
 	)
 
+	// Parse custom resource selector
+	labelSet, err := labels.ConvertSelectorToLabelsMap(cfg.CustomResourceSelector)
+	if err != nil {
+		return fmt.Errorf("failed to parse custom resource selector: %w", err)
+	}
+
 	// Setup cache
 	cacheOpts := cache.Options{
-		DefaultNamespaces: make(map[string]cache.Config),
+		SyncPeriod:           lo.ToPtr(cfg.SyncPeriod),
+		DefaultNamespaces:    make(map[string]cache.Config),
+		DefaultLabelSelector: labelSet.AsSelector(),
 	}
 	for _, namespace := range strings.Split(cfg.WatchNamespaces, ",") {
 		cacheOpts.DefaultNamespaces[namespace] = cache.Config{}
@@ -237,6 +245,7 @@ func runManager(ctx context.Context, command *cli.Command) error { //nolint:cycl
 	}
 
 	// Create HTTP client
+	setupLog.Info("creating HTTP client")
 	httpClient, err := client.New()
 	if err != nil {
 		return fmt.Errorf("failed to create HTTP client: %w", err)
@@ -256,17 +265,18 @@ func runManager(ctx context.Context, command *cli.Command) error { //nolint:cycl
 		return fmt.Errorf("failed to setup controllers: %w", err)
 	}
 
-	defer func(ctrls ...controller.Controller) {
-		err := controller.Close(ctrls...)
-		if err != nil {
-			setupLog.Error(err, "failed to close controller")
-		}
-	}(controllers...)
-
 	// +kubebuilder:scaffold:builder
 
 	// Start the manager
-	setupLog.Info("starting manager")
+	setupLog.Info(
+		"starting manager",
+		"syncPeriod",
+		cfg.SyncPeriod,
+		"watchNamespaces",
+		cfg.WatchNamespaces,
+		"customResourceSelector",
+		cfg.CustomResourceSelector,
+	)
 	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
 		return fmt.Errorf("failed to start manager: %w", err)
 	}

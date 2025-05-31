@@ -20,14 +20,12 @@ import (
 	"context"
 	"fmt"
 
-	"go.uber.org/multierr"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
 type Controller interface {
 	Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error)
 	SetupWithManager(ctx context.Context, mgr ctrl.Manager) error
-	Close() error
 }
 
 func SetupWithManager(ctx context.Context, mgr ctrl.Manager, controller ...Controller) error {
@@ -37,13 +35,4 @@ func SetupWithManager(ctx context.Context, mgr ctrl.Manager, controller ...Contr
 		}
 	}
 	return nil
-}
-
-func Close(controller ...Controller) error {
-	var err error
-	for _, c := range controller {
-		multierr.AppendFunc(&err, c.Close)
-	}
-
-	return err
 }

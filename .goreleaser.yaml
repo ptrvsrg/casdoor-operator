@@ -15,7 +15,8 @@
 version: 2
 before:
   hooks:
-    - sh -c 'mkdir -p crds && touch crds/crds_{{ .Version }}.yaml && cat config/crd/bases/*.yaml | awk "{print}" > crds/crds_{{ .Version }}.yaml'
+    - sh -c 'mkdir -p manifests && touch manifests/crds_{{ .Version }}.yaml && cat config/crd/bases/*.yaml | awk "{print}" > manifests/crds_{{ .Version }}.yaml'
+    - sh -c 'mkdir -p manifests && touch manifests/install_operator_{{ .Version }}.yaml && helm template ./charts/casdoor-operator --values ./charts/casdoor-operator/values.yaml --name-template test > manifests/install_operator_{{ .Version }}.yaml'
     - yarn --cwd docs --frozen-lockfile
     - yarn --cwd docs build
     - make crd
@@ -86,8 +87,10 @@ release:
   draft: false
   name_template: "{{.ProjectName}}-v{{.Version}}"
   extra_files:
-    - glob: crds/crds_{{ .Version }}.yaml
+    - glob: manifests/crds_{{ .Version }}.yaml
       name_template: crds_{{ .Version }}.yaml
+    - glob: manifests/install_operator_{{ .Version }}.yaml
+      name_template: install_operator_{{ .Version }}.yaml
   header: |
     ## Release version {{ .Tag }} dated {{ .Date }}
     

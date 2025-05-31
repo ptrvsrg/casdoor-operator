@@ -13,7 +13,6 @@ require (
 	github.com/urfave/cli/v3 v3.3.3
 	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.27.0
-	golang.org/x/net v0.40.0
 	k8s.io/api v0.33.0
 	k8s.io/apimachinery v0.33.0
 	k8s.io/client-go v0.33.0
@@ -27,6 +26,7 @@ require (
 	github.com/antlr4-go/antlr/v4 v4.13.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
+	github.com/casdoor/casdoor-go-sdk v1.5.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
@@ -45,6 +45,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
+	github.com/golang-jwt/jwt/v4 v4.5.2 // indirect
 	github.com/google/btree v1.1.3 // indirect
 	github.com/google/cel-go v0.25.0 // indirect
 	github.com/google/gnostic-models v0.6.9 // indirect
@@ -81,6 +82,7 @@ require (
 	go.uber.org/automaxprocs v1.6.0 // indirect
 	golang.org/x/crypto v0.38.0 // indirect
 	golang.org/x/exp v0.0.0-20250506013437-ce4c2cf36ca6 // indirect
+	golang.org/x/net v0.40.0 // indirect
 	golang.org/x/oauth2 v0.30.0 // indirect
 	golang.org/x/sync v0.14.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect

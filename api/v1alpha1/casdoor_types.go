@@ -29,9 +29,25 @@ type CasdoorSpec struct {
 	// +kubebuilder:validation:Required
 	URL string `json:"url"`
 
-	// AdminCredentialsSecret is the secret name of Casdoor admin credentials
+	// OrganizationName is the name of Casdoor organization
 	// +kubebuilder:validation:Required
-	AdminCredentialsSecret corev1.LocalObjectReference `json:"adminCredentialsSecret"`
+	OrganizationName string `json:"organizationName"`
+
+	// ApplicationName is the name of Casdoor application
+	// +kubebuilder:validation:Required
+	ApplicationName string `json:"applicationName"`
+
+	// ClientID is the client ID of Casdoor
+	// +kubebuilder:validation:Required
+	ClientID string `json:"clientID"`
+
+	// ClientSecret is the secret selector of Casdoor client secret
+	// +kubebuilder:validation:Required
+	ClientSecret corev1.SecretKeySelector `json:"clientSecret"`
+
+	// JwtCertificate is the secret selector of Casdoor JWT certificate
+	// +kubebuilder:validation:Required
+	JwtCertificate corev1.SecretKeySelector `json:"jwtCertificate"`
 
 	// Healthcheck is the configuration of healthcheck
 	// +kubebuilder:validation:Optional
@@ -54,11 +70,6 @@ type CasdoorHealthcheckSpec struct {
 	// +kubebuilder:default="/"
 	Path string `json:"path"`
 
-	// Interval of healthcheck
-	// +kubebuilder:validation:Optional
-	// +kubebuilder:default="1m"
-	Interval metav1.Duration `json:"interval"`
-
 	// Timeout of healthcheck
 	// +kubebuilder:validation:Optional
 	// +kubebuilder:default="1m"
@@ -71,24 +82,31 @@ type CasdoorHealthcheckSpec struct {
 	Retries int `json:"retries"`
 }
 
+// CasdoorStatusCode is the status of Casdoor
 type CasdoorStatusCode string
 
 const (
-	CasdoorStatusReady  CasdoorStatusCode = "Ready"
-	CasdoorStatusFailed CasdoorStatusCode = "Failed"
+	CasdoorStatusReady    CasdoorStatusCode = "Ready"
+	CasdoorStatusNotReady CasdoorStatusCode = "NotReady"
+	CasdoorStatusUnknown  CasdoorStatusCode = "Unknown"
 )
 
 // CasdoorStatus defines the observed state of Casdoor
 type CasdoorStatus struct {
-	// Code of Casdoor instance status
+	// Code is the status of Casdoor
+	// +kubebuilder:validation:Optional
+	// +kubebuilder:validation:Enum=Ready;NotReady;Unknown
+	// +kubebuilder:default="Unknown"
 	Code CasdoorStatusCode `json:"code"`
 
-	// Reason of Casdoor instance failure
+	// Reason is the description of the NotReady status
+	// +kubebuilder:validation:Optional
 	Reason string `json:"reason,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
+// +kubebuilder:printcolumn:name="URL",type=string,JSONPath=`.spec.url`
 // +kubebuilder:printcolumn:name="Age",type=string,JSONPath=`.metadata.creationTimestamp`
 // +kubebuilder:printcolumn:name="Status",type=string,JSONPath=`.status.code`
 // +kubebuilder:resource:shortName={"casdoor"},categories=all;casdoor

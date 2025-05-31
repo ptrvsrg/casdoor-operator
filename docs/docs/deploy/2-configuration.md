@@ -2,17 +2,19 @@
 
 ## Config schema reference
 
-| Property              | Environment variable | Property type                                                           | Default | Description                                                                                        |
-|-----------------------|----------------------|-------------------------------------------------------------------------|---------|----------------------------------------------------------------------------------------------------|
-| `watchNamespaces`     | `WATCH_NAMESPACES`   | string                                                                  | ""      | A comma-separated list of namespaces to watch for resources. If empty, all namespaces are watched. |
-| `enableHTTP2`         | `ENABLE_HTTP2`       | boolean                                                                 | true    | Enables or disables HTTP/2 support for the service.                                                |
-| `metrics`             |                      | [MetricsConfig](#metricsconfig-schema-reference)                        |         | Configuration for metrics collection and exposure.                                                 |
-| `probe`               |                      | [ProbeConfig](#probeconfig-schema-reference)                            |         | Configuration for health and readiness probes.                                                     |
-| `pprof`               |                      | [PprofConfig](#pprofconfig-schema-reference)                            |         | Configuration for pprof profiling endpoints.                                                       |
-| `logging`             |                      | [LoggingConfig](#loggingconfig-schema-reference)                        |         | Configuration for logging behavior and format.                                                     |
-| `leaderElection`      |                      | [LeaderElectionConfig](#leaderelectionconfig-schema-reference)          |         | Configuration for leader election in a multi-instance setup.                                       |
-| `globalController`    |                      | [GlobalControllerConfig](#globalcontrollerconfig-schema-reference)      |         | Global configuration for controllers managing resources.                                           |
-| `specificControllers` |                      | [SpecificControllerConfig](#specificcontrollersconfig-schema-reference) |         | Configuration specific to individual controllers.                                                  |
+| Property                 | Environment variable       | Property type                                                           | Default | Description                                                                                        |
+|--------------------------|----------------------------|-------------------------------------------------------------------------|---------|----------------------------------------------------------------------------------------------------|
+| `syncPeriod`             | `SYNC_PERIOD`              | string                                                                  | "5m"    | SyncPeriod determines the minimum frequency at which watched resources are reconciled.             |
+| `watchNamespaces`        | `WATCH_NAMESPACES`         | string                                                                  | ""      | A comma-separated list of namespaces to watch for resources. If empty, all namespaces are watched. |
+| `customResourceSelector` | `CUSTOM_RESOURCE_SELECTOR` | string                                                                  | ""      | A selector for custom resources.                                                                   |
+| `enableHTTP2`            | `ENABLE_HTTP2`             | boolean                                                                 | true    | Enables or disables HTTP/2 support for the service.                                                |
+| `metrics`                |                            | [MetricsConfig](#metricsconfig-schema-reference)                        |         | Configuration for metrics collection and exposure.                                                 |
+| `probe`                  |                            | [ProbeConfig](#probeconfig-schema-reference)                            |         | Configuration for health and readiness probes.                                                     |
+| `pprof`                  |                            | [PprofConfig](#pprofconfig-schema-reference)                            |         | Configuration for pprof profiling endpoints.                                                       |
+| `logging`                |                            | [LoggingConfig](#loggingconfig-schema-reference)                        |         | Configuration for logging behavior and format.                                                     |
+| `leaderElection`         |                            | [LeaderElectionConfig](#leaderelectionconfig-schema-reference)          |         | Configuration for leader election in a multi-instance setup.                                       |
+| `globalController`       |                            | [GlobalControllerConfig](#globalcontrollerconfig-schema-reference)      |         | Global configuration for controllers managing resources.                                           |
+| `specificControllers`    |                            | [SpecificControllerConfig](#specificcontrollersconfig-schema-reference) |         | Configuration specific to individual controllers.                                                  |
 
 ## MetricsConfig schema reference
 

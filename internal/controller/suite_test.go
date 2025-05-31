@@ -26,7 +26,6 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"resty.dev/v3"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 
@@ -37,10 +36,8 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	"github.com/ptrvsrg/casdoor-operator/config"
-	httpclient "github.com/ptrvsrg/casdoor-operator/internal/http/client"
-
 	casdoorv1alpha1 "github.com/ptrvsrg/casdoor-operator/api/v1alpha1"
+	"github.com/ptrvsrg/casdoor-operator/config"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -50,7 +47,6 @@ import (
 var cfg *rest.Config
 var mgr ctrl.Manager
 var k8sClient client.Client
-var httpClient *resty.Client
 var appCfg config.Config
 var testEnv *envtest.Environment
 var ctx context.Context
@@ -99,10 +95,6 @@ var _ = BeforeSuite(
 		k8sClient, err = client.New(cfg, client.Options{Scheme: scheme.Scheme})
 		Expect(err).ToNot(HaveOccurred())
 
-		httpClient, err = httpclient.New()
-		Expect(err).NotTo(HaveOccurred())
-		Expect(httpClient).NotTo(BeNil())
-
 		appCfg = config.Config{
 			SpecificControllers: config.SpecificControllersConfig{
 				Casdoor: config.CasdoorControllerConfig{
@@ -121,8 +113,6 @@ var _ = BeforeSuite(
 				},
 			),
 		)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(httpClient).NotTo(BeNil())
 
 		go func() {
 			defer GinkgoRecover()

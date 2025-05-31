@@ -11,7 +11,7 @@ metadata:
   labels:
     {{- include "casdoor.labels" . | nindent 4 }}
 data:
-  app.conf: |
+  app.conf: |-
     {{- range $key, $value := .Values.app }}
     {{ $key }} = {{ $value }}
     {{- end }}

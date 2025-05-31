@@ -21,8 +21,10 @@ package config
 import "time"
 
 type Config struct {
-	WatchNamespaces string `yaml:"watchNamespaces" env:"WATCH_NAMESPACES"`
-	EnableHTTP2     *bool  `yaml:"enableHTTP2" env:"ENABLE_HTTP2" env-default:"true"`
+	SyncPeriod             time.Duration `yaml:"syncPeriod" env:"SYNC_PERIOD" env-default:"5m"`
+	WatchNamespaces        string        `yaml:"watchNamespaces" env:"WATCH_NAMESPACES"`
+	CustomResourceSelector string        `yaml:"customResourceSelector" env:"CUSTOM_RESOURCE_SELECTOR"`
+	EnableHTTP2            *bool         `yaml:"enableHTTP2" env:"ENABLE_HTTP2" env-default:"true"`
 
 	Metrics             MetricsConfig             `yaml:"metrics"`
 	Probe               ProbeConfig               `yaml:"probe"`
