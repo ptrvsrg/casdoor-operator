@@ -4,6 +4,7 @@
 
 | Property                 | Environment variable       | Property type                                                           | Default | Description                                                                                        |
 |--------------------------|----------------------------|-------------------------------------------------------------------------|---------|----------------------------------------------------------------------------------------------------|
+| `syncPeriod`             | `SYNC_PERIOD`              | string                                                                  | "5m"    | SyncPeriod determines the minimum frequency at which watched resources are reconciled.             |
 | `watchNamespaces`        | `WATCH_NAMESPACES`         | string                                                                  | ""      | A comma-separated list of namespaces to watch for resources. If empty, all namespaces are watched. |
 | `customResourceSelector` | `CUSTOM_RESOURCE_SELECTOR` | string                                                                  | ""      | A selector for custom resources.                                                                   |
 | `enableHTTP2`            | `ENABLE_HTTP2`             | boolean                                                                 | true    | Enables or disables HTTP/2 support for the service.                                                |

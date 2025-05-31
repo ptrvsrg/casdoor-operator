@@ -195,6 +195,7 @@ func runManager(ctx context.Context, command *cli.Command) error { //nolint:cycl
 
 	// Setup cache
 	cacheOpts := cache.Options{
+		SyncPeriod:           lo.ToPtr(cfg.SyncPeriod),
 		DefaultNamespaces:    make(map[string]cache.Config),
 		DefaultLabelSelector: labelSet.AsSelector(),
 	}
@@ -267,7 +268,15 @@ func runManager(ctx context.Context, command *cli.Command) error { //nolint:cycl
 	// +kubebuilder:scaffold:builder
 
 	// Start the manager
-	setupLog.Info("starting manager")
+	setupLog.Info(
+		"starting manager",
+		"syncPeriod",
+		cfg.SyncPeriod,
+		"watchNamespaces",
+		cfg.WatchNamespaces,
+		"customResourceSelector",
+		cfg.CustomResourceSelector,
+	)
 	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
 		return fmt.Errorf("failed to start manager: %w", err)
 	}

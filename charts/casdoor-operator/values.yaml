@@ -68,11 +68,13 @@ affinity: {}
 
 revisionHistoryLimit: 10
 
-enableHTTP2: true
+syncPeriod: 5m
 
 watchNamespaces: []
 
 customResourceSelector: ""
+
+enableHTTP2: true
 
 metrics:
   enabled: false
