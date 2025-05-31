@@ -26,6 +26,9 @@ spec:
     - jsonPath: .metadata.creationTimestamp
       name: Age
       type: string
+    - jsonPath: .status.code
+      name: Status
+      type: string
     name: v1alpha1
     schema:
       openAPIV3Schema:
@@ -81,6 +84,43 @@ spec:
                 - key
                 type: object
                 x-kubernetes-map-type: atomic
+              healthcheck:
+                description: Healthcheck is the configuration of healthcheck
+                properties:
+                  enabled:
+                    default: false
+                    description: Enabled is the flag to enable healthcheck
+                    type: boolean
+                  method:
+                    default: GET
+                    description: Method of healthcheck
+                    enum:
+                    - GET
+                    - POST
+                    - PUT
+                    - PATCH
+                    - DELETE
+                    - CONNECT
+                    - OPTIONS
+                    - TRACE
+                    - HEAD
+                    type: string
+                  path:
+                    default: /
+                    description: Path of healthcheck
+                    type: string
+                  retries:
+                    default: 3
+                    description: Retries of healthcheck
+                    minimum: 0
+                    type: integer
+                  timeout:
+                    default: 1m
+                    description: Timeout of healthcheck
+                    type: string
+                required:
+                - enabled
+                type: object
               jwtCertificate:
                 description: JwtCertificate is the secret selector of Casdoor JWT
                   certificate
@@ -119,7 +159,23 @@ spec:
             - organizationName
             - url
             type: object
+          status:
+            description: CasdoorStatus defines the observed state of Casdoor
+            properties:
+              code:
+                default: Unknown
+                description: Code is the status of Casdoor
+                enum:
+                - Ready
+                - NotReady
+                - Unknown
+                type: string
+              reason:
+                description: Reason is the description of the NotReady status
+                type: string
+            type: object
         type: object
     served: true
     storage: true
-    subresources: {}
+    subresources:
+      status: {}

@@ -48,11 +48,67 @@ type CasdoorSpec struct {
 	// JwtCertificate is the secret selector of Casdoor JWT certificate
 	// +kubebuilder:validation:Required
 	JwtCertificate corev1.SecretKeySelector `json:"jwtCertificate"`
+
+	// Healthcheck is the configuration of healthcheck
+	// +kubebuilder:validation:Optional
+	Healthcheck *CasdoorHealthcheckSpec `json:"healthcheck,omitempty"`
+}
+
+type CasdoorHealthcheckSpec struct {
+	// Enabled is the flag to enable healthcheck
+	// +kubebuilder:default=false
+	Enabled bool `json:"enabled"`
+
+	// Method of healthcheck
+	// +kubebuilder:validation:Optional
+	// +kubebuilder:validation:Enum=GET;POST;PUT;PATCH;DELETE;CONNECT;OPTIONS;TRACE;HEAD
+	// +kubebuilder:default="GET"
+	Method string `json:"method"`
+
+	// Path of healthcheck
+	// +kubebuilder:validation:Optional
+	// +kubebuilder:default="/"
+	Path string `json:"path"`
+
+	// Timeout of healthcheck
+	// +kubebuilder:validation:Optional
+	// +kubebuilder:default="1m"
+	Timeout metav1.Duration `json:"timeout"`
+
+	// Retries of healthcheck
+	// +kubebuilder:validation:Optional
+	// +kubebuilder:validation:Minimum=0
+	// +kubebuilder:default=3
+	Retries int `json:"retries"`
+}
+
+// CasdoorStatusCode is the status of Casdoor
+type CasdoorStatusCode string
+
+const (
+	CasdoorStatusReady    CasdoorStatusCode = "Ready"
+	CasdoorStatusNotReady CasdoorStatusCode = "NotReady"
+	CasdoorStatusUnknown  CasdoorStatusCode = "Unknown"
+)
+
+// CasdoorStatus defines the observed state of Casdoor
+type CasdoorStatus struct {
+	// Code is the status of Casdoor
+	// +kubebuilder:validation:Optional
+	// +kubebuilder:validation:Enum=Ready;NotReady;Unknown
+	// +kubebuilder:default="Unknown"
+	Code CasdoorStatusCode `json:"code"`
+
+	// Reason is the description of the NotReady status
+	// +kubebuilder:validation:Optional
+	Reason string `json:"reason,omitempty"`
 }
 
 // +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="URL",type=string,JSONPath=`.spec.url`
 // +kubebuilder:printcolumn:name="Age",type=string,JSONPath=`.metadata.creationTimestamp`
+// +kubebuilder:printcolumn:name="Status",type=string,JSONPath=`.status.code`
 // +kubebuilder:resource:shortName={"casdoor"},categories=all;casdoor
 // +kubebuilder:k8s:openapi-gen=true
 
@@ -61,7 +117,8 @@ type Casdoor struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec CasdoorSpec `json:"spec,omitempty"`
+	Spec   CasdoorSpec   `json:"spec,omitempty"`
+	Status CasdoorStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true

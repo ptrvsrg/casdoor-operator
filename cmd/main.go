@@ -30,6 +30,7 @@ import (
 	"github.com/samber/lo"
 	"go.uber.org/zap"
 	"k8s.io/apimachinery/pkg/labels"
+	"resty.dev/v3"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	kconfig "sigs.k8s.io/controller-runtime/pkg/config"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
@@ -37,6 +38,7 @@ import (
 	casdoorv1alpha1 "github.com/ptrvsrg/casdoor-operator/api/v1alpha1"
 	"github.com/ptrvsrg/casdoor-operator/config"
 	"github.com/ptrvsrg/casdoor-operator/internal/controller"
+	"github.com/ptrvsrg/casdoor-operator/internal/http/client"
 	"github.com/ptrvsrg/casdoor-operator/internal/logging"
 	"github.com/ptrvsrg/casdoor-operator/internal/version"
 
@@ -241,20 +243,26 @@ func runManager(ctx context.Context, command *cli.Command) error { //nolint:cycl
 		return fmt.Errorf("failed to set up ready check: %w", err)
 	}
 
+	// Create HTTP client
+	setupLog.Info("creating HTTP client")
+	httpClient, err := client.New()
+	if err != nil {
+		return fmt.Errorf("failed to create HTTP client: %w", err)
+	}
+	defer func(httpClient *resty.Client) {
+		err := httpClient.Close()
+		if err != nil {
+			setupLog.Error(err, "failed to close HTTP client")
+		}
+	}(httpClient)
+
 	// Register controllers
 	controllers := []controller.Controller{
-		controller.NewCasdoorReconciler(mgr.GetClient(), mgr.GetScheme(), cfg.SpecificControllers.Casdoor),
+		controller.NewCasdoorReconciler(mgr.GetClient(), mgr.GetScheme(), cfg.SpecificControllers.Casdoor, httpClient),
 	}
 	if err = controller.SetupWithManager(ctx, mgr, controllers...); err != nil {
 		return fmt.Errorf("failed to setup controllers: %w", err)
 	}
-
-	defer func(ctrls ...controller.Controller) {
-		err := controller.Close(ctrls...)
-		if err != nil {
-			setupLog.Error(err, "failed to close controller")
-		}
-	}(controllers...)
 
 	// +kubebuilder:scaffold:builder
 
